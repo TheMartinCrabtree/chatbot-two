@@ -1,61 +1,90 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
-const LayoutWrapper = styled.div``;
 
+const secretKey = process.env.REACT_APP_CHAT_KEY;
+const LayoutWrapper = styled.div`
+  padding: 20px;
+  min-height: 600px;
+  width: 100%;
+`;
+const StyledTextarea = styled.textarea`
+  background-color: white;
+  color: black;
+  min-width: 80vw;
+`;
 
-try {
-	const response = await axios.post(
-	‘https://api.openai.com/v1/engines/davinci/completions',
-	{
-	prompt: inputText,
-	max_tokens: 100,
-	},
-{
-	headers: {
-		‘Content-Type’: ‘application/json’,
-		‘Authorization’: `Bearer ${apiKey}`,
-	},
-}
-);
-setGeneratedText(response.data.choices[0].text);
-} catch (error) {
-console.error(‘Error generating text:’, error);
-}
+const SubmitButton = styled.button`
+  background-color: gray;
+  color: black;
+  border-radius: 15px;
+  width: 150px;
+  height: 60px;
+`;
 
+const OutputContainer = styled.p``;
 
 const ChatContainer = (props) => {
-  const apiKEY = process.env.REACT_APP_CHAT_KEY;
-  console.log("chatkey", CHATKEY);
-  const [generatedText, setGeneratedText] = useState('');
-  const [inputText, setInputText] = useState('');
+  const [generatedText, setGeneratedText] = useState("");
+  // const [loading, setLoading] = useState(false);
+  const [inputText, setInputText] = useState("");
 
-  const getText = async()=>{
-    try{
-        const response = await axios.post(
-            "https://api.openai.com/v1/engines/davinci/completions",
-            {
-                prompt: inputText,
-                max_tokens: 100, // max character length
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${apiKEY}`,
-                }
-            },
-        );
-        setGeneratedText(response.data.choices[0].text);
-    } catch (error) 
-    {
-        console.error("ERROR getting text: ", error);
+  const _getText = async () => {
+    console.log("hit async _getText");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${secretKey}`,
     };
-    
-
-    return<div></div>
+    const apiRequestBody = {
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "Explain all concepts like a pirate.",
+        },
+        {
+          role: "user",
+          content: "Say hello to me.",
+        },
+      ],
+    };
+    await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(apiRequestBody),
+    })
+      .then((data) => {
+        return data.json();
+      })
+      .then((data) => {
+        console.log("Returned data from api: ", data);
+        const apiReply = "";
+        return apiReply;
+      });
   };
 
-  return <div>Chat Container</div>;
+  return (
+    <LayoutWrapper>
+      <div>
+        <div>
+          <h3>Generated Text</h3>
+          <OutputContainer>{generatedText}</OutputContainer>
+        </div>
+        <div>
+          <label>Input text here:</label>
+        </div>
+        <StyledTextarea
+          id="textInput"
+          rows={5}
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          placeholder="Enter text here."
+        />
+        <div>
+          <SubmitButton onClick={_getText}>Submit</SubmitButton>
+        </div>
+      </div>
+    </LayoutWrapper>
+  );
 };
 
 export default ChatContainer;

@@ -10,7 +10,6 @@ const MainContainer = styled.div`
 function App() {
   return (
     <MainContainer>
-      App
       <ChatContainer />
     </MainContainer>
   );
