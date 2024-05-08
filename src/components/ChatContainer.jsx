@@ -5,8 +5,13 @@ const secretKey = process.env.REACT_APP_CHAT_KEY;
 const LayoutWrapper = styled.div`
   padding: 20px;
   min-height: 600px;
-  width: 100%;
+  width: 85%;
 `;
+
+const TextAreaWrapper = styled.div`
+  padding: 2em 0;
+`;
+
 const StyledTextarea = styled.textarea`
   background-color: white;
   border-radius: 15px;
@@ -15,16 +20,8 @@ const StyledTextarea = styled.textarea`
   padding: 1em;
 `;
 
-// const SubmitButton = styled.button`
-//   background-color: gray;
-//   color: black;
-//   border-radius: 15px;
-//   width: 150px;
-//   height: 60px;
-// `;
-
 const OutputContainer = styled.div`
-  background-color: white;
+  background-color: #fceaff;
   min-height: 5vh;
   max-height: 20vh;
   color: black;
@@ -32,24 +29,46 @@ const OutputContainer = styled.div`
   padding: 1em;
 `;
 
+const UserLabel = styled.span`
+  ${({ $user }) => ($user === "system" ? "color: red;" : "color: blue;")}
+`;
+const UserText = styled.span`
+  ${({ $user }) =>
+    $user === "system" ? "color: #a34141;" : "color: #317fc5;"};
+`;
+
+const testChatLog = [
+  {
+    id: 12354 + "user",
+    role: "user",
+    content: "test user text one",
+  },
+  {
+    id: 12354 + "system",
+    role: "system",
+    content: "test system text one",
+  },
+  {
+    id: 12356 + "user",
+    role: "user",
+    content: "test user text two",
+  },
+  {
+    id: 12356 + "system",
+    role: "system",
+    content: "test system text two",
+  },
+];
+
 const ChatContainer = (props) => {
-  const [chatLog, setChatLog] = useState([]);
+  // const [chatLog, setChatLog] = useState([]);
+  const [chatLog, setChatLog] = useState(testChatLog);
   const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState("");
-  console.log("chatLog", chatLog);
-
-  useEffect(() => {
-    console.log("hit useEffect isloading");
-    isLoading && inputText && _getAPIResponse();
-  }, [isLoading]);
 
   const _handleInputChange = (e) => {
     return e && e.target && setInputText(e.target.value ? e.target.value : "");
-    // debounce input
-    // return setTimeout(
-    //   (e) => e && e.target && e.target.value && setInputText(e.target.value),
-    //   50
-    // );
+    // should set up a debounce input
   };
 
   const _handleEnterKey = (e) => {
@@ -61,7 +80,6 @@ const ChatContainer = (props) => {
       };
       setIsLoading(true);
       setChatLog([...chatLog, userMessage]);
-      // _getAPIResponse();
     }
   };
 
@@ -72,8 +90,10 @@ const ChatContainer = (props) => {
         const { id, role, content } = chatData;
         return (
           <div key={id}>
-            <span>{role === "system" ? "ChatBot: " : "You: "}</span>
-            {content}
+            <UserLabel $user={role}>
+              {role === "system" ? "ChatBot: " : "You: "}
+            </UserLabel>
+            <UserText $user={role}>{content}</UserText>
           </div>
         );
       })
@@ -81,8 +101,6 @@ const ChatContainer = (props) => {
   };
 
   const _getAPIResponse = async () => {
-    console.log("hit async _getAPIResponse");
-
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${secretKey}`,
@@ -106,7 +124,6 @@ const ChatContainer = (props) => {
         return data.json();
       })
       .then((data) => {
-        console.log("Returned data from api: ", data);
         setIsLoading(false);
         setInputText("");
         const apiReply =
@@ -126,27 +143,30 @@ const ChatContainer = (props) => {
       });
   };
 
+  useEffect(() => {
+    isLoading && inputText && _getAPIResponse();
+  }, [isLoading]);
+
   return (
     <LayoutWrapper>
       <div>
         <div>
-          <h3>Generated Text</h3>
+          <h3>Chat with New Yorker Bot</h3>
           <OutputContainer>
             {_renderChat()}
             {isLoading && <div>Waiting for a response...</div>}
           </OutputContainer>
         </div>
-        <div>
-          <label>Input text here:</label>
-        </div>
-        <StyledTextarea
-          id="textInput"
-          rows={5}
-          value={inputText}
-          onChange={_handleInputChange}
-          onKeyDown={_handleEnterKey}
-          placeholder="Enter text here."
-        />
+        <TextAreaWrapper>
+          <StyledTextarea
+            id="textInput"
+            rows={5}
+            value={inputText}
+            onChange={_handleInputChange}
+            onKeyDown={_handleEnterKey}
+            placeholder="Enter text here."
+          />
+        </TextAreaWrapper>
       </div>
     </LayoutWrapper>
   );
