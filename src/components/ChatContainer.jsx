@@ -29,6 +29,10 @@ const OutputContainer = styled.div`
   padding: 1em;
 `;
 
+const CopyContainer = styled.div`
+  font-size: 0.6em;
+`;
+
 const UserLabel = styled.span`
   ${({ $user }) => ($user === "system" ? "color: red;" : "color: blue;")}
 `;
@@ -168,6 +172,10 @@ const ChatContainer = (props) => {
           />
         </TextAreaWrapper>
       </div>
+      <CopyContainer>
+        {" "}
+        &copy; {new Date().getFullYear()} M.Crabtree
+      </CopyContainer>
     </LayoutWrapper>
   );
 };
