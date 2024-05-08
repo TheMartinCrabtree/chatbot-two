@@ -41,6 +41,7 @@ const UserText = styled.span`
     $user === "system" ? "color: #a34141;" : "color: #317fc5;"};
 `;
 
+/*
 const testChatLog = [
   {
     id: 12354 + "user",
@@ -63,10 +64,11 @@ const testChatLog = [
     content: "test system text two",
   },
 ];
+*/
 
 const ChatContainer = (props) => {
-  // const [chatLog, setChatLog] = useState([]);
-  const [chatLog, setChatLog] = useState(testChatLog);
+  const [chatLog, setChatLog] = useState([]);
+  // const [chatLog, setChatLog] = useState(testChatLog);
   const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState("");
 
@@ -114,7 +116,8 @@ const ChatContainer = (props) => {
       messages: [
         {
           role: "system",
-          content: "Reply in less than 15 words.",
+          content:
+            "Reply in less than 15 words, and in the tone of a New Yorker.",
         },
         { role: "user", content: inputText },
       ],
